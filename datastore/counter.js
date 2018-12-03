@@ -46,19 +46,17 @@ exports.getNextUniqueId = (callback) => {
   readCounter( (err, success) => {
     if (err) {
       // console.log('Cannot read counter');
-      throw ('Cannot read counter');
-      return callback(err);
+      callback(err);
     }
     let counter = success;
     counter++;
     writeCounter(counter, (err, success) => {
       if (err) {
         // console.log('Cannon write counter');
-        throw ('Cannon write counter');
-        return callback(err);
+        callback(err);
       }
       // console.log('Success writting counter')
-      return callback(null, zeroPaddedNumber(counter));
+      callback(null, zeroPaddedNumber(counter));
     });
   });
 };
