@@ -38,9 +38,29 @@ const writeCounter = (count, callback) => {
 
 // Public API - Fix this function //////////////////////////////////////////////
 
-exports.getNextUniqueId = () => {
-  counter = counter + 1;
-  return zeroPaddedNumber(counter);
+exports.getNextUniqueId = (callback) => {
+  // read file counter  
+  // increase
+  // write file counter
+  // return new zero padded id
+  readCounter( (err, success) => {
+    if (err) {
+      // console.log('Cannot read counter');
+      throw ('Cannot read counter');
+      return callback(err);
+    }
+    let counter = success;
+    counter++;
+    writeCounter(counter, (err, success) => {
+      if (err) {
+        // console.log('Cannon write counter');
+        throw ('Cannon write counter');
+        return callback(err);
+      }
+      // console.log('Success writting counter')
+      return callback(null, zeroPaddedNumber(counter));
+    })
+  });
 };
 
 
