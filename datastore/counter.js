@@ -59,7 +59,7 @@ exports.getNextUniqueId = (callback) => {
       }
       // console.log('Success writting counter')
       return callback(null, zeroPaddedNumber(counter));
-    })
+    });
   });
 };
 
