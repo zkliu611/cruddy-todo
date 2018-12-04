@@ -46,13 +46,18 @@ exports.readOne = (id, callback) => {
 };
 
 exports.update = (id, text, callback) => {
-  var item = items[id];
-  if (!item) {
-    callback(new Error(`No item with id: ${id}`));
-  } else {
-    items[id] = text;
-    callback(null, { id, text });
-  }
+  exports.readOne(id, (err, fileObject) => {
+    if (err) {
+      let errorId = fileObject ? fileObject.id : null;
+      return callback(new Error(`No item with id: ${errorId}`));
+    }
+    fs.writeFile(path.join(exports.dataDir, fileObject.id + '.txt'), text, (err) => {
+      if (err) {
+        throw ('Error: cannot write file');
+      }
+      callback(null, { id, text });
+    });
+  });
 };
 
 exports.delete = (id, callback) => {
