@@ -27,29 +27,14 @@ exports.create = (text, callback) => {
 exports.readAll = () => {
   return Promise.promisify(fs.readdir)(exports.dataDir)
     .then((files) => {
-      // loop through files
-      // create a promise for readign each one
-      // return Promise.all();
-      var readPromises = [];
-      files.map((fileName) => {
-        return Promise.promisify(fs.readFile)(path.join(exports.dataDir, fileName))
+      var readPromises = files.map((fileName) => {
+        return Promise.promisify(fs.readFile)(path.join(exports.dataDir, fileName), 'utf8')
           .then((file) => {
             return { id: fileName.replace('.txt', ''), text: file };
           });
       });
-
       return Promise.all(readPromises);
     });
-  // var data = [];
-  // fs.readdir(exports.dataDir, (err, files) => {
-  //   if (err) {
-  //     throw ('Error: cannot read files');
-  //   }
-  //   files.forEach((file) => {
-  //     data.push({ id: file.replace('.txt', ''), text: file.replace('.txt', '') });
-  //   });
-  //   callback(null, data);
-  // });
 };
 
 exports.readOne = (id, callback) => {
