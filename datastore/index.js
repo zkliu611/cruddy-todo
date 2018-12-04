@@ -3,6 +3,8 @@ const path = require('path');
 const _ = require('underscore');
 const counter = require('./counter');
 
+const Promise = require('bluebird');
+
 var items = {};
 
 // Public API - Fix these CRUD functions ///////////////////////////////////////
@@ -22,17 +24,29 @@ exports.create = (text, callback) => {
   });
 };
 
-exports.readAll = (callback) => {
-  var data = [];
-  fs.readdir(exports.dataDir, (err, files) => {
-    if (err) {
-      throw ('Error: cannot read files');
-    }
-    files.forEach((file) => {
-      data.push({ id: file.replace('.txt', ''), text: file.replace('.txt', '') });
+exports.readAll = () => {
+  return Promise.promisify(fs.readdir)(exports.dataDir)
+    .then((files) => {
+      // loop through files
+      // create a promise for readign each one
+      // return Promise.all();
+      var data = [];
+      data.forEach((file) => {
+        data.push({ id: file.replace('.txt', ''), text: file.replace('.txt', '') });
+      });
+
+      return data;
     });
-    callback(null, data);
-  });
+  // var data = [];
+  // fs.readdir(exports.dataDir, (err, files) => {
+  //   if (err) {
+  //     throw ('Error: cannot read files');
+  //   }
+  //   files.forEach((file) => {
+  //     data.push({ id: file.replace('.txt', ''), text: file.replace('.txt', '') });
+  //   });
+  //   callback(null, data);
+  // });
 };
 
 exports.readOne = (id, callback) => {
