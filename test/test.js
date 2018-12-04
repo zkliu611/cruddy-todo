@@ -68,6 +68,17 @@ describe('todos', () => {
 
   describe('create', () => {
     it('should create a new file for each todo', (done) => {
+      // todos.create('todo1')
+      //   .then(data => {
+      //     const todoCount = fs.readdirSync(todos.dataDir).length;
+      //     expect(todoCount).to.equal(1);
+      //     todos.create('todo2')
+      //       .then(data => {
+      //        expect(fs.readdirSync(todos.dataDir)).to.have.lengthOf(2);
+      //        done(); 
+      //       });
+      //   })
+      //   .catch(done);
       todos.create('todo1', (err, data) => {
         const todoCount = fs.readdirSync(todos.dataDir).length;
         expect(todoCount).to.equal(1);
@@ -145,6 +156,17 @@ describe('todos', () => {
     });
 
     it('should find a todo by id', (done) => {
+      // const todoText = 'buy chocolate';
+      // todos.create(todoText)
+      //   .then(createdTodo => {
+      //     const id = createdTodo.id;
+      //     todos.readOne(id)
+      //       .then(readTodo => {
+      //        expect(readTodo).to.deep.equal({ id, text: todoText });
+      //        done(); 
+      //       });
+      //   })
+      //   .catch(done);
       const todoText = 'buy chocolate';
       todos.create(todoText, (err, createdTodo) => {
         const id = createdTodo.id;

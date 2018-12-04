@@ -10,6 +10,17 @@ var items = {};
 // Public API - Fix these CRUD functions ///////////////////////////////////////
 
 exports.create = (text, callback) => {
+  // PROMISE VERSION
+  // return Promise.promisify(counter.getNextUniqueId)()
+  //   .then(id => {
+  //     let fileName = path.join(exports.dataDir, id + '.txt');
+  //     return Promise.promisify(fs.writeFile)(fileName, text)
+  //       .then(() => {
+  //         return { id, text };
+  //       });
+  //   });
+
+  // CALLBACK VERSION
   counter.getNextUniqueId((err, id) => {
     if (err) {
       throw ('Error: cannot read counter');
@@ -38,6 +49,13 @@ exports.readAll = () => {
 };
 
 exports.readOne = (id, callback) => {
+  // PROMISE VERSION
+  // var text = items[id];
+  // return Promise.promisify(fs.readFile)(path.join(exports.dataDir, id + '.txt'), 'utf8')
+  //   .then(text => {
+  //     return { id, text };
+  //   });
+  // CALLBACK VERSION
   var text = items[id];
   fs.readFile(path.join(exports.dataDir, id + '.txt'), 'utf8', (err, text) => {
     if (err) {
@@ -48,6 +66,13 @@ exports.readOne = (id, callback) => {
 };
 
 exports.update = (id, text, callback) => {
+  // return Promise.promisify(exports.readOne)(id)
+  //   .then(fileObject => {
+  //     return Promise.promisify(fs.writeFile)(path.join(exports.dataDir, fileObject.id + '.txt'), text)
+  //       .then(() => {
+  //         return { id, text };
+  //       });
+  // });
   exports.readOne(id, (err, fileObject) => {
     if (err) {
       let errorId = fileObject ? fileObject.id : null;
@@ -63,6 +88,10 @@ exports.update = (id, text, callback) => {
 };
 
 exports.delete = (id, callback) => {
+  // return Promise.promisify(fs.unlink)(path.join(exports.dataDir, id + '.txt'))
+  //   .then(() => {
+  //     return ;
+  //   });
   fs.unlink(path.join(exports.dataDir, id + '.txt'), (err) => {
     if (err) {
       return callback(new Error(`No item with id: ${id}`));
