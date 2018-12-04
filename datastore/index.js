@@ -26,11 +26,18 @@ exports.create = (text, callback) => {
       throw ('Error: cannot read counter');
     }
     let filename = path.join(exports.dataDir, id + '.txt');
-    fs.writeFile(filename, text, (err) => {
+    let time = Date.now();
+    let finalContent = { 
+      id: id,
+      text: text,
+      createdAt: time,
+      updatedAt: time
+    };
+    fs.writeFile(filename, JSON.stringify(finalContent), (err) => {
       if (err) {
         throw ('Error: cannot write file');
       }
-      callback(null, { id, text });
+      callback(null, finalContent);
     });
   });
 };
@@ -41,7 +48,12 @@ exports.readAll = () => {
       var result = fileNames.map((fileName) => {
         return Promise.promisify(fs.readFile)(path.join(exports.dataDir, fileName), 'utf8')
           .then((fileContent) => {
-            return {'id': fileName.replace('.txt', ''), 'text': fileContent};
+            // extract data
+            return JSON.parse(fileContent);
+            // return {
+            //   'id': fileName.replace('.txt', ''),
+            //   'text': fileContent
+            // };
           });
       });
       return Promise.all(result);
@@ -50,18 +62,16 @@ exports.readAll = () => {
 
 exports.readOne = (id, callback) => {
   // PROMISE VERSION
-  // var text = items[id];
   // return Promise.promisify(fs.readFile)(path.join(exports.dataDir, id + '.txt'), 'utf8')
   //   .then(text => {
   //     return { id, text };
   //   });
   // CALLBACK VERSION
-  var text = items[id];
-  fs.readFile(path.join(exports.dataDir, id + '.txt'), 'utf8', (err, text) => {
+  fs.readFile(path.join(exports.dataDir, id + '.txt'), 'utf8', (err, fileContent) => {
     if (err) {
       return callback(new Error(`No item with id: ${id}`));
     }
-    callback(null, { id, text });
+    callback(null, JSON.parse(fileContent));
   });
 };
 
@@ -78,11 +88,13 @@ exports.update = (id, text, callback) => {
       let errorId = fileObject ? fileObject.id : null;
       return callback(new Error(`No item with id: ${errorId}`));
     }
-    fs.writeFile(path.join(exports.dataDir, fileObject.id + '.txt'), text, (err) => {
+    fileObject.text = text;
+    fileObject.updatedAt = Date.now();
+    fs.writeFile(path.join(exports.dataDir, fileObject.id + '.txt'), JSON.stringify(fileObject), (err) => {
       if (err) {
         throw ('Error: cannot write file');
       }
-      callback(null, { id, text });
+      callback(null, fileObject);
     });
   });
 };
