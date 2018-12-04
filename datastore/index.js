@@ -25,15 +25,15 @@ exports.create = (text, callback) => {
 };
 
 exports.readAll = () => {
-  return Promise.promisify(fs.readdir)(exports.dataDir)
-    .then((files) => {
-      var readPromises = files.map((fileName) => {
+  return Promise.promisify(fs.readdir)(path.join(exports.dataDir))
+    .then((fileNames) => {
+      var result = fileNames.map((fileName) => {
         return Promise.promisify(fs.readFile)(path.join(exports.dataDir, fileName), 'utf8')
-          .then((file) => {
-            return { id: fileName.replace('.txt', ''), text: file };
+          .then((fileContent) => {
+            return {'id': fileName.replace('.txt', ''), 'text': fileContent};
           });
       });
-      return Promise.all(readPromises);
+      return Promise.all(result);
     });
 };
 

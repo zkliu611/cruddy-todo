@@ -1,6 +1,7 @@
 const fs = require('fs');
 const path = require('path');
 const sprintf = require('sprintf-js').sprintf;
+const Promise = require('bluebird');
 
 var counter = 0;
 
@@ -16,49 +17,73 @@ const zeroPaddedNumber = (num) => {
 };
 
 const readCounter = (callback) => {
-  fs.readFile(exports.counterFile, (err, fileData) => {
-    if (err) {
-      callback(null, 0);
-    } else {
+  Promise.promisify(fs.readFile)(exports.counterFile)
+    .then((fileData) => {
       callback(null, Number(fileData));
-    }
-  });
+    })
+    .catch((err) => {
+      callback(null, 0);
+    });
+
+  // fs.readFile(exports.counterFile, (err, fileData) => {
+  //   if (err) {
+  //     callback(null, 0);
+  //   } else {
+  //     callback(null, Number(fileData));
+  //   }
+  // });
 };
 
 const writeCounter = (count, callback) => {
   var counterString = zeroPaddedNumber(count);
-  fs.writeFile(exports.counterFile, counterString, (err) => {
-    if (err) {
-      throw ('error writing counter');
-    } else {
+  Promise.promisify(fs.writeFile)(exports.counterFile, counterString)
+    .then(()=>{
       callback(null, counterString);
-    }
-  });
+    })
+    .catch((err) => {
+      callback(err);
+    });
+
+  // var counterString = zeroPaddedNumber(count);
+  // fs.writeFile(exports.counterFile, counterString, (err) => {
+  //   if (err) {
+  //     throw ('error writing counter');
+  //   } else {
+  //     callback(null, counterString);
+  //   }
+  // });
 };
 
 // Public API - Fix this function //////////////////////////////////////////////
 
 exports.getNextUniqueId = (callback) => {
-  // read file counter  
-  // increase
-  // write file counter
-  // return new zero padded id
-  readCounter( (err, success) => {
-    if (err) {
-      // console.log('Cannot read counter');
+  Promise.promisify(readCounter)()
+    .then((success) => {
+      let counter = success;
+      counter++;
+      return Promise.promisify(writeCounter)(counter)
+        .then((success) => {
+          callback(null, zeroPaddedNumber(counter));
+        });
+    })
+    .catch(err => {
       callback(err);
-    }
-    let counter = success;
-    counter++;
-    writeCounter(counter, (err, success) => {
-      if (err) {
-        // console.log('Cannon write counter');
-        callback(err);
-      }
-      // console.log('Success writting counter')
-      callback(null, zeroPaddedNumber(counter));
     });
-  });
+
+
+  // readCounter( (err, success) => {
+  //   if (err) {
+  //     callback(err);
+  //   }
+  //   let counter = success;
+  //   counter++;
+  //   writeCounter(counter, (err, success) => {
+  //     if (err) {
+  //       callback(err);
+  //     }
+  //     callback(null, zeroPaddedNumber(counter));
+  //   });
+  // });
 };
 
 
