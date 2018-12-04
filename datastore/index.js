@@ -30,12 +30,15 @@ exports.readAll = () => {
       // loop through files
       // create a promise for readign each one
       // return Promise.all();
-      var data = [];
-      data.forEach((file) => {
-        data.push({ id: file.replace('.txt', ''), text: file.replace('.txt', '') });
+      var readPromises = [];
+      files.map((fileName) => {
+        return Promise.promisify(fs.readFile)(path.join(exports.dataDir, fileName))
+          .then((file) => {
+            return { id: fileName.replace('.txt', ''), text: file };
+          });
       });
 
-      return data;
+      return Promise.all(readPromises);
     });
   // var data = [];
   // fs.readdir(exports.dataDir, (err, files) => {
